@@ -6,6 +6,10 @@ output "api_url" {
   value = google_cloud_run_v2_service.api_service.uri
 }
 
+output "frontend_url" {
+  value = google_cloud_run_v2_service.frontend_service.uri
+}
+
 output "function_name" {
   value = google_cloudfunctions2_function.gcs_trigger.name
 }

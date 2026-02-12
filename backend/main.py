@@ -1,7 +1,7 @@
 import datetime
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 try:
     from processor import DocumentProcessor
     from bq_handler import BigQueryHandler
@@ -58,3 +58,24 @@ async def process_document(request: ProcessRequest):
         return {"status": "failed", "error": error}
 
     return {"status": "success", "document_type": record["document_type"]}
+
+async def verify_token(authorization: str = Header(...)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid token format")
+    # In a real app, we would verify the token against Google OAuth2
+    # For this exercise, we assume the token is valid if present.
+    return authorization.split(" ")[1]
+
+@app.get("/documents")
+async def get_documents(
+    date: Optional[str] = None, 
+    limit: int = 100,
+    token: str = Depends(verify_token)
+):
+    """
+    Endpoint to list processed documents.
+    """
+    records, error = bq_handler.list_records(limit=limit, date_filter=date)
+    if error:
+        raise HTTPException(status_code=500, detail=error)
+    return records

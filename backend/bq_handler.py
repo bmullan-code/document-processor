@@ -33,3 +33,30 @@ class BigQueryHandler:
         except Exception as e:
             print(f"BigQuery exception: {str(e)}")
             return False, str(e)
+
+    def list_records(self, limit: int = 100, date_filter: str = None):
+        """
+        Lists records from the BigQuery table.
+        date_filter should be in YYYY-MM-DD format.
+        """
+        try:
+            query = f"SELECT * FROM `{self.table_ref}`"
+            if date_filter:
+                query += f" WHERE DATE(processed_at) = '{date_filter}'"
+            query += f" ORDER BY processed_at DESC LIMIT {limit}"
+            
+            query_job = self.client.query(query)
+            results = query_job.result()
+            
+            records = []
+            for row in results:
+                record = dict(row)
+                # Convert timestamp and json to serializable formats
+                if record.get("processed_at"):
+                    record["processed_at"] = record["processed_at"].isoformat()
+                records.append(record)
+            
+            return records, None
+        except Exception as e:
+            print(f"BigQuery list exception: {str(e)}")
+            return None, str(e)

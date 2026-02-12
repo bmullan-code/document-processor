@@ -8,9 +8,9 @@ from vertexai.generative_models import GenerativeModel, Part, GenerationConfig
 class DocumentProcessor:
     def __init__(self):
         self.project_id = os.getenv("GOOGLE_CLOUD_PROJECT")
-        self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
+        self.location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
         vertexai.init(project=self.project_id, location=self.location)
-        self.model = GenerativeModel("gemini-1.5-flash")
+        self.model = GenerativeModel("gemini-3-flash-preview")
         self.storage_client = storage.Client()
 
     def process_document(self, gcs_uri):

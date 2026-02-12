@@ -120,12 +120,38 @@ resource "google_cloud_run_v2_service" "api_service" {
   }
 }
 
-# Allow service account to invoke Cloud Run
+# Allow service account to invoke Cloud Run (Internal components)
 resource "google_cloud_run_v2_service_iam_member" "api_invoker" {
   location = google_cloud_run_v2_service.api_service.location
   name     = google_cloud_run_v2_service.api_service.name
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.service_account.email}"
+}
+
+# Frontend Cloud Run Service
+resource "google_cloud_run_v2_service" "frontend_service" {
+  name     = "doc-processor-frontend"
+  location = var.region
+  ingress  = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
+
+  template {
+    service_account = google_service_account.service_account.email
+    containers {
+      image = "gcr.io/${var.project_id}/doc-processor-frontend:latest"
+      # Nginx will proxy /api to the backend URI. 
+      # We could pass this as an env var if we had a more complex nginx config or runtime injector.
+      # For now, we assume the backend URI is known or configured in nginx.
+    }
+  }
+}
+
+# Allow public access to the frontend
+resource "google_cloud_run_v2_service_iam_member" "public_frontend" {
+  location = google_cloud_run_v2_service.frontend_service.location
+  name     = google_cloud_run_v2_service.frontend_service.name
+  role     = "roles/run.invoker"
+  member   = "allUsers"
 }
 
 # Source code zip for Cloud Function
