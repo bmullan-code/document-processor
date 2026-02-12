@@ -139,9 +139,10 @@ resource "google_cloud_run_v2_service" "frontend_service" {
     service_account = google_service_account.service_account.email
     containers {
       image = "gcr.io/${var.project_id}/doc-processor-frontend:latest"
-      # Nginx will proxy /api to the backend URI. 
-      # We could pass this as an env var if we had a more complex nginx config or runtime injector.
-      # For now, we assume the backend URI is known or configured in nginx.
+      env {
+        name  = "BACKEND_URL"
+        value = google_cloud_run_v2_service.api_service.uri
+      }
     }
   }
 }

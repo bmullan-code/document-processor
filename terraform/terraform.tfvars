@@ -1,5 +1,5 @@
 project_id  = "sandbox2-363416"
 region      = "us-central1"
-bucket_name = "document-processor"
+bucket_name = "bmullan-document-processor"
 dataset_id  = "document_processing"
 table_id    = "processed_documents"
