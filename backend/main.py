@@ -2,8 +2,12 @@ import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
-from .processor import DocumentProcessor
-from .bq_handler import BigQueryHandler
+try:
+    from processor import DocumentProcessor
+    from bq_handler import BigQueryHandler
+except ImportError:
+    from .processor import DocumentProcessor
+    from .bq_handler import BigQueryHandler
 
 app = FastAPI(title="Document Processor API")
 processor = DocumentProcessor()

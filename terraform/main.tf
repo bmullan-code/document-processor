@@ -120,7 +120,7 @@ resource "google_cloud_run_v2_service" "api_service" {
   }
 }
 
-# Allow internal traffic to Cloud Run
+# Allow service account to invoke Cloud Run
 resource "google_cloud_run_v2_service_iam_member" "api_invoker" {
   location = google_cloud_run_v2_service.api_service.location
   name     = google_cloud_run_v2_service.api_service.name
