@@ -98,6 +98,7 @@ resource "google_cloud_run_v2_service" "api_service" {
   name     = "doc-processor-api"
   location = var.region
   ingress  = "INGRESS_TRAFFIC_ALL"
+  deletion_protection = false
 
   template {
     service_account = google_service_account.service_account.email
